@@ -4,10 +4,11 @@ import me.cortex.nvidium.NvidiumWorldRenderer;
 import me.cortex.nvidium.config.ConfigGuiBuilder;
 import me.cortex.nvidium.sodiumCompat.INvidiumWorldRendererGetter;
 import me.cortex.nvidium.sodiumCompat.NvidiumOptionFlags;
-import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
-import me.jellysquid.mods.sodium.client.gui.options.*;
-import me.jellysquid.mods.sodium.client.gui.options.storage.OptionStorage;
-import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
+import net.caffeinemc.mods.sodium.client.gui.SodiumOptionsGUI;
+import net.caffeinemc.mods.sodium.client.gui.options.OptionFlag;
+import net.caffeinemc.mods.sodium.client.gui.options.OptionPage;
+import net.caffeinemc.mods.sodium.client.gui.options.storage.OptionStorage;
+import net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import org.spongepowered.asm.mixin.Final;
@@ -18,7 +19,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.*;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
 
 @Mixin(value = SodiumOptionsGUI.class, remap = false)
 public class MixinSodiumOptionsGUI {
