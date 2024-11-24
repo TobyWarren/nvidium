@@ -14,7 +14,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = ChunkBuilderMeshingTask.class, remap = false)
 public class MixinChunkBuilderMeshingTask {
-    @Inject(method = "execute(Lme/jellysquid/mods/sodium/client/render/chunk/compile/ChunkBuildContext;Lme/jellysquid/mods/sodium/client/util/task/CancellationToken;)Lme/jellysquid/mods/sodium/client/render/chunk/compile/ChunkBuildOutput;", at = @At("TAIL"))
+
+    net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildContext
+    net.caffeinemc.mods.sodium.client.util.task.CancellationToken
+    net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildOutput
+
+    // this inject doesn't wanna work correctly?
+    @Inject(method = "execute(Lme/caffeinemc/mods/sodium/client/render/chunk/compile/ChunkBuildContext;" +
+            "Lme/caffeinemc/mods/sodium/client/util/task/CancellationToken;" +
+            ")Lme/caffeinemc/mods/sodium/client/render/chunk/compile/ChunkBuildOutput;", at = @At("TAIL"))
     private void repackageResults(ChunkBuildContext buildContext, CancellationToken cancellationToken, CallbackInfoReturnable<ChunkBuildOutput> cir) {
         if (Nvidium.IS_ENABLED) {
             var result = cir.getReturnValue();

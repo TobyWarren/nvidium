@@ -6,17 +6,15 @@ import me.cortex.nvidium.managers.SectionManager;
 import me.cortex.nvidium.sodiumCompat.NvidiumCompactChunkVertex;
 import me.cortex.nvidium.util.DownloadTaskStream;
 import me.cortex.nvidium.util.UploadingBufferStream;
-import me.jellysquid.mods.sodium.client.SodiumClientMod;
-import me.jellysquid.mods.sodium.client.render.chunk.ChunkRenderMatrices;
-import me.jellysquid.mods.sodium.client.render.chunk.RenderSection;
-import me.jellysquid.mods.sodium.client.render.chunk.compile.ChunkBuildOutput;
-import me.jellysquid.mods.sodium.client.render.chunk.vertex.format.impl.CompactChunkVertex;
-import me.jellysquid.mods.sodium.client.render.viewport.Viewport;
+import net.caffeinemc.mods.sodium.client.SodiumClientMod;
+import net.caffeinemc.mods.sodium.client.render.chunk.ChunkRenderMatrices;
+import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
+import net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildOutput;
+import net.caffeinemc.mods.sodium.client.render.viewport.Viewport;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.texture.Sprite;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4fc;
-import org.joml.Matrix4x3fc;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +42,7 @@ public class NvidiumWorldRenderer {
     //Note: the reason that asyncChunkTracker is passed in as an already constructed object is cause of the amount of argmuents it takes to construct it
     public NvidiumWorldRenderer(AsyncOcclusionTracker asyncChunkTracker) {
         int frames = SodiumClientMod.options().advanced.cpuRenderAheadLimit+1;
+
         //32 mb upload buffer
         this.uploadStream = new UploadingBufferStream(device, 32000000);
         //8 mb download buffer

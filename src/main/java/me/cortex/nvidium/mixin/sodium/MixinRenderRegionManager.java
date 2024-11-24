@@ -1,5 +1,6 @@
 package me.cortex.nvidium.mixin.sodium;
 
+import kroppeb.stareval.exception.UnexpectedTokenException;
 import me.cortex.nvidium.Nvidium;
 import me.cortex.nvidium.NvidiumWorldRenderer;
 import me.cortex.nvidium.sodiumCompat.INvidiumWorldRendererSetter;
@@ -24,7 +25,11 @@ public abstract class MixinRenderRegionManager implements INvidiumWorldRendererS
     @Unique private NvidiumWorldRenderer renderer;
 
 
-    @Redirect(method = "uploadMeshes(Lme/jellysquid/mods/sodium/client/gl/device/CommandList;Ljava/util/Collection;)V", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/chunk/region/RenderRegionManager;uploadMeshes(Lme/jellysquid/mods/sodium/client/gl/device/CommandList;Lme/jellysquid/mods/sodium/client/render/chunk/region/RenderRegion;Ljava/util/Collection;)V"))
+    @Redirect(method = "uploadMeshes(net/caffeinemc/mods/sodium/client/gl/device/CommandList;Ljava/util/Collection;)V",
+            at = @At(value = "INVOKE", target =
+                    "Lnet/caffeinemc/mods/sodium/client/render/chunk/region/RenderRegionManager;" +
+                            "uploadMeshes(Lnet/caffeinemc/mods/sodium/client/gl/device/CommandList;" +
+                            "Lnet/caffeinemc/mods/sodium/client/render/chunk/region/RenderRegion;Ljava/util/Collection;)V"))
     private void redirectUpload(RenderRegionManager instance, CommandList cmdList, RenderRegion pass, Collection<ChunkBuildOutput> uploadQueue) {
         if (Nvidium.IS_ENABLED) {
             uploadQueue.forEach(renderer::uploadBuildResult);

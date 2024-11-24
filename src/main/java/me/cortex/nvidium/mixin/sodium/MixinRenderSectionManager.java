@@ -41,10 +41,14 @@ import java.util.Map;
 public class MixinRenderSectionManager implements INvidiumWorldRendererGetter {
     @Shadow @Final private RenderRegionManager regions;
     @Shadow @Final private Long2ReferenceMap<RenderSection> sectionByPosition;
-    @Shadow private @NotNull Map<ChunkUpdateType, ArrayDeque<RenderSection>> rebuildLists;
+    @Unique private @NotNull Map<ChunkUpdateType, ArrayDeque<RenderSection>> rebuildLists;
     @Shadow @Final private int renderDistance;
     @Unique private NvidiumWorldRenderer renderer;
     @Unique private Viewport viewport;
+
+    public MixinRenderSectionManager(@NotNull Map<ChunkUpdateType, ArrayDeque<RenderSection>> rebuildLists) {
+        this.rebuildLists = rebuildLists;
+    }
 
     @Unique
     private static void updateNvidiumIsEnabled() {
@@ -62,7 +66,7 @@ public class MixinRenderSectionManager implements INvidiumWorldRendererGetter {
         }
     }
 
-    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/chunk/compile/executor/ChunkBuilder;<init>(Lnet/minecraft/client/world/ClientWorld;Lme/jellysquid/mods/sodium/client/render/chunk/vertex/format/ChunkVertexType;)V", remap = true), index = 1)
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/compile/executor/ChunkBuilder;<init>(Lnet/minecraft/client/world/ClientWorld;Lnet/caffeinemc/mods/sodium/client/render/chunk/vertex/format/ChunkVertexType;)V", remap = true), index = 1)
     private ChunkVertexType modifyVertexType(ChunkVertexType vertexType) {
         updateNvidiumIsEnabled();
         if (Nvidium.IS_ENABLED) {
@@ -83,7 +87,7 @@ public class MixinRenderSectionManager implements INvidiumWorldRendererGetter {
         }
     }
 
-    @Redirect(method = "onSectionRemoved", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/chunk/RenderSection;delete()V"))
+    @Redirect(method = "onSectionRemoved", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;delete()V"))
     private void deleteSection(RenderSection section) {
         if (Nvidium.IS_ENABLED) {
             if (Nvidium.config.region_keep_distance == 32) {
@@ -94,7 +98,7 @@ public class MixinRenderSectionManager implements INvidiumWorldRendererGetter {
     }
 
     @Inject(method = "update", at = @At("HEAD"))
-    private void trackViewport(Camera camera, Viewport viewport, int frame, boolean spectator, CallbackInfo ci) {
+    private void trackViewport(Camera camera, Viewport viewport, boolean spectator, CallbackInfo ci) {
         this.viewport = viewport;
     }
 
@@ -134,7 +138,7 @@ public class MixinRenderSectionManager implements INvidiumWorldRendererGetter {
         }
     }
 
-    @Redirect(method = "submitRebuildTasks", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/chunk/RenderSection;setPendingUpdate(Lme/jellysquid/mods/sodium/client/render/chunk/ChunkUpdateType;)V"))
+    @Redirect(method = "submitRebuildTasks", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;setPendingUpdate(Lnet/caffeinemc/mods/sodium/client/render/chunk/ChunkUpdateType;)V"))
     private void injectEnqueueFalse(RenderSection instance, ChunkUpdateType type) {
         instance.setPendingUpdate(type);
         if (Nvidium.IS_ENABLED && Nvidium.config.async_bfs) {
@@ -151,7 +155,7 @@ public class MixinRenderSectionManager implements INvidiumWorldRendererGetter {
         return delta <= 1;
     }
 
-    @Inject(method = "isSectionVisible", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/chunk/RenderSection;getLastVisibleFrame()I", shift = At.Shift.BEFORE), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "isSectionVisible", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;getLastVisibleFrame()I", shift = At.Shift.BEFORE), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     private void redirectIsSectionVisible(int x, int y, int z, CallbackInfoReturnable<Boolean> cir, RenderSection render) {
         if (Nvidium.IS_ENABLED && Nvidium.config.async_bfs) {
             cir.setReturnValue(isSectionVisibleBfs(render));
@@ -172,7 +176,7 @@ public class MixinRenderSectionManager implements INvidiumWorldRendererGetter {
         }
     }
 
-    @Inject(method = "scheduleRebuild", at = @At(value = "INVOKE", target = "Lme/jellysquid/mods/sodium/client/render/chunk/RenderSection;setPendingUpdate(Lme/jellysquid/mods/sodium/client/render/chunk/ChunkUpdateType;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "scheduleRebuild", at = @At(value = "INVOKE", target = "Lnet/caffeinemc/mods/sodium/client/render/chunk/RenderSection;setPendingUpdate(Lnet/caffeinemc/mods/sodium/client/render/chunk/ChunkUpdateType;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILHARD)
     private void instantReschedule(int x, int y, int z, boolean important, CallbackInfo ci, RenderSection section, ChunkUpdateType pendingUpdate) {
         if (Nvidium.IS_ENABLED && Nvidium.config.async_bfs) {
             var queue = rebuildLists.get(pendingUpdate);

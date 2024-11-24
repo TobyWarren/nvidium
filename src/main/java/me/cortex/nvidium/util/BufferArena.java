@@ -16,7 +16,6 @@ public class BufferArena {
 
     private final long memory_size;
 
-
     public BufferArena(RenderDevice device, long memory, int vertexFormatSize) {
         this.device = device;
         this.vertexFormatSize = vertexFormatSize;

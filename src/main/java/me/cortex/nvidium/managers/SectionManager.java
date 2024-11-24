@@ -11,10 +11,9 @@ import me.cortex.nvidium.sodiumCompat.IRepackagedResult;
 import me.cortex.nvidium.util.BufferArena;
 import me.cortex.nvidium.util.SegmentedManager;
 import me.cortex.nvidium.util.UploadingBufferStream;
-import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
-import me.jellysquid.mods.sodium.client.render.chunk.RenderSection;
-import me.jellysquid.mods.sodium.client.render.chunk.compile.ChunkBuildOutput;
-import net.minecraft.client.MinecraftClient;
+import net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer;
+import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
+import net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildOutput;
 import net.minecraft.util.math.ChunkSectionPos;
 import org.joml.Vector3i;
 import org.joml.Vector4i;
@@ -87,6 +86,7 @@ public class SectionManager {
             this.section2terrain.put(sectionKey, terrainAddress);
 
             long geometryUpload = terrainAreana.upload(uploadStream, terrainAddress);
+
             MemoryUtil.memCopy(MemoryUtil.memAddress(output.geometry().getDirectBuffer()), geometryUpload, output.geometry().getLength());
         }
 

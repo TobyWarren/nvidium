@@ -1,19 +1,18 @@
 package me.cortex.nvidium.sodiumCompat;
 
-
-import me.jellysquid.mods.sodium.client.gl.attribute.GlVertexAttributeFormat;
-import me.jellysquid.mods.sodium.client.gl.attribute.GlVertexFormat;
-import me.jellysquid.mods.sodium.client.render.chunk.terrain.material.Material;
-import me.jellysquid.mods.sodium.client.render.chunk.vertex.format.ChunkMeshAttribute;
-import me.jellysquid.mods.sodium.client.render.chunk.vertex.format.ChunkVertexEncoder;
-import me.jellysquid.mods.sodium.client.render.chunk.vertex.format.ChunkVertexType;
 import net.caffeinemc.mods.sodium.api.util.ColorABGR;
 import net.caffeinemc.mods.sodium.api.util.ColorU8;
+import net.caffeinemc.mods.sodium.client.gl.attribute.GlVertexAttribute;
+import net.caffeinemc.mods.sodium.client.gl.attribute.GlVertexFormat;
+import net.caffeinemc.mods.sodium.client.render.chunk.terrain.material.Material;
+import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkVertexEncoder;
+import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkVertexType;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.system.MemoryUtil;
 
 public class NvidiumCompactChunkVertex implements ChunkVertexType {
-    public static final GlVertexFormat<ChunkMeshAttribute> VERTEX_FORMAT = new GlVertexFormat<>(ChunkMeshAttribute.class, null, 16);
+    public static final GlVertexFormat VERTEX_FORMAT = new GlVertexFormat(GlVertexAttribute.class, null, 16);
+
 
     public static final int STRIDE = 16;
     public static final NvidiumCompactChunkVertex INSTANCE = new NvidiumCompactChunkVertex();

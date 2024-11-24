@@ -3,7 +3,6 @@ package me.cortex.nvidium;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.ints.*;
-import me.cortex.nvidium.api0.NvidiumAPI;
 import me.cortex.nvidium.config.StatisticsLoggingLevel;
 import me.cortex.nvidium.config.TranslucencySortingLevel;
 import me.cortex.nvidium.gl.RenderDevice;
@@ -15,10 +14,9 @@ import me.cortex.nvidium.renderers.*;
 import me.cortex.nvidium.util.DownloadTaskStream;
 import me.cortex.nvidium.util.TickableManager;
 import me.cortex.nvidium.util.UploadingBufferStream;
-import me.jellysquid.mods.sodium.client.render.chunk.ChunkRenderMatrices;
-import me.jellysquid.mods.sodium.client.render.viewport.Viewport;
+import net.caffeinemc.mods.sodium.client.render.chunk.ChunkRenderMatrices;
+import net.caffeinemc.mods.sodium.client.render.viewport.Viewport;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
 import org.joml.*;
 import org.lwjgl.opengl.GL11C;
 import org.lwjgl.system.MemoryUtil;
@@ -35,7 +33,6 @@ import static org.lwjgl.opengl.GL30C.GL_RED_INTEGER;
 import static org.lwjgl.opengl.GL42.*;
 import static org.lwjgl.opengl.GL43C.GL_SHADER_STORAGE_BARRIER_BIT;
 import static org.lwjgl.opengl.NVRepresentativeFragmentTest.GL_REPRESENTATIVE_FRAGMENT_TEST_NV;
-import static org.lwjgl.opengl.NVShaderBufferStore.GL_SHADER_GLOBAL_ACCESS_BARRIER_BIT_NV;
 import static org.lwjgl.opengl.NVUniformBufferUnifiedMemory.GL_UNIFORM_BUFFER_ADDRESS_NV;
 import static org.lwjgl.opengl.NVUniformBufferUnifiedMemory.GL_UNIFORM_BUFFER_UNIFIED_NV;
 import static org.lwjgl.opengl.NVVertexBufferUnifiedMemory.*;
@@ -259,7 +256,7 @@ public class RenderPipeline {
             addr += 16;
             new Vector4f(delta,0).getToAddress(addr);//Subchunk offset (note, delta is already negated)
             addr += 16;
-            new Vector4f(RenderSystem.getShaderFogColor()).getToAddress(addr);
+            new Vector4f(RenderSystem.getShaderColor()).getToAddress(addr);
             addr += 16;
             MemoryUtil.memPutLong(addr, sceneUniform.getDeviceAddress() + SCENE_SIZE);//Put in the location of the region indexs
             addr += 8;
@@ -290,11 +287,11 @@ public class RenderPipeline {
             addr += 4;
             MemoryUtil.memPutFloat(addr, ((float)screenHeight)/2);
             addr += 4;
-            MemoryUtil.memPutFloat(addr, RenderSystem.getShaderFogStart());//FogStart
+            MemoryUtil.memPutFloat(addr, RenderSystem.getShaderFog().start());//FogStart
             addr += 4;
-            MemoryUtil.memPutFloat(addr, RenderSystem.getShaderFogEnd());//FogEnd
+            MemoryUtil.memPutFloat(addr, RenderSystem.getShaderFog().end());//FogEnd
             addr += 4;
-            MemoryUtil.memPutInt(addr, RenderSystem.getShaderFogShape().getId());//IsSphericalFog
+            MemoryUtil.memPutInt(addr, RenderSystem.getShaderFog().shape().getId());//IsSphericalFog
             addr += 4;
             MemoryUtil.memPutShort(addr, (short) visibleRegions);
             addr += 2;
