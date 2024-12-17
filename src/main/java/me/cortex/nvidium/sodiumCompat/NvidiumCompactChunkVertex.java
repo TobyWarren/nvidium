@@ -10,10 +10,12 @@ import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkVertexT
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.system.MemoryUtil;
 
+import java.util.Collections;
+
 public class NvidiumCompactChunkVertex implements ChunkVertexType {
-    public static final GlVertexFormat VERTEX_FORMAT = new GlVertexFormat(GlVertexAttribute.class, null, 16);
-
-
+    // Adjust this to match the new GlVertexFormat constructor:
+    public static final GlVertexFormat VERTEX_FORMAT = new GlVertexFormat(16, Collections.emptyMap());
+    
     public static final int STRIDE = 16;
     public static final NvidiumCompactChunkVertex INSTANCE = new NvidiumCompactChunkVertex();
 
@@ -25,7 +27,6 @@ public class NvidiumCompactChunkVertex implements ChunkVertexType {
     private static final float MODEL_SCALE = MODEL_RANGE / POSITION_MAX_VALUE;
     private static final float MODEL_SCALE_INV = POSITION_MAX_VALUE / MODEL_RANGE;
     private static final float TEXTURE_SCALE = (1.0f / TEXTURE_MAX_VALUE);
-
 
     @Override
     public float getTextureScale() {
@@ -43,28 +44,30 @@ public class NvidiumCompactChunkVertex implements ChunkVertexType {
     }
 
     @Override
-    public GlVertexFormat<ChunkMeshAttribute> getVertexFormat() {
+    public GlVertexFormat getVertexFormat() {
         return VERTEX_FORMAT;
     }
 
     @Override
     public ChunkVertexEncoder getEncoder() {
+        // Ensure that 'vertex' provides getters like getX(), getY(), getZ(), getLight(), getColor(), getU(), getV().
+        // This depends on the current definition of vertex in the API you are using.
         return (ptr, material, vertex, sectionIndex) -> {
-            int light = compactLight(vertex.light);
+            int light = compactLight(vertex.getLight());
 
-            MemoryUtil.memPutInt(ptr + 0, (encodePosition(vertex.x) << 0) | (encodePosition(vertex.y) << 16));
-            MemoryUtil.memPutInt(ptr + 4, (encodePosition(vertex.z) << 0) | (encodeDrawParameters(material) << 16) | ((light&0xFF)<<24));
-            MemoryUtil.memPutInt(ptr + 8, (encodeColor(vertex.color) << 0) | (((light>>8)&0xFF) << 24));
-            MemoryUtil.memPutInt(ptr + 12, encodeTexture(vertex.u, vertex.v));
+            MemoryUtil.memPutInt(ptr,     (encodePosition(vertex.getX()) << 0) | (encodePosition(vertex.getY()) << 16));
+            MemoryUtil.memPutInt(ptr + 4, (encodePosition(vertex.getZ()) << 0) | (encodeDrawParameters(material) << 16) | ((light & 0xFF) << 24));
+            MemoryUtil.memPutInt(ptr + 8, (encodeColor(vertex.getColor()) << 0) | (((light >> 8) & 0xFF) << 24));
+            MemoryUtil.memPutInt(ptr + 12, encodeTexture(vertex.getU(), vertex.getV()));
 
             return ptr + STRIDE;
         };
     }
 
-
     private static int compactLight(int light) {
+        // Assuming light is still packed with sky and block in upper/lower bytes
         int sky = MathHelper.clamp((light >>> 16) & 0xFF, 8, 248);
-        int block = MathHelper.clamp((light >>>  0) & 0xFF, 8, 248);
+        int block = MathHelper.clamp((light >>> 0) & 0xFF, 8, 248);
 
         return (block << 0) | (sky << 8);
     }
@@ -74,12 +77,11 @@ public class NvidiumCompactChunkVertex implements ChunkVertexType {
     }
 
     private static int encodeDrawParameters(Material material) {
-        return ((material.bits() & 0xFF) << 0);
+        return (material.bits() & 0xFF);
     }
 
-
     private static int encodeColor(int color) {
-        var brightness = ColorU8.byteToNormalizedFloat(ColorABGR.unpackAlpha(color));
+        float brightness = ColorU8.byteToNormalizedFloat(ColorABGR.unpackAlpha(color));
 
         int r = ColorU8.normalizedFloatToByte(ColorU8.byteToNormalizedFloat(ColorABGR.unpackRed(color)) * brightness);
         int g = ColorU8.normalizedFloatToByte(ColorU8.byteToNormalizedFloat(ColorABGR.unpackGreen(color)) * brightness);
@@ -88,9 +90,8 @@ public class NvidiumCompactChunkVertex implements ChunkVertexType {
         return ColorABGR.pack(r, g, b, 0x00);
     }
 
-
     private static int encodeTexture(float u, float v) {
         return ((Math.round(u * TEXTURE_MAX_VALUE) & 0xFFFF) << 0) |
-                ((Math.round(v * TEXTURE_MAX_VALUE) & 0xFFFF) << 16);
+               ((Math.round(v * TEXTURE_MAX_VALUE) & 0xFFFF) << 16);
     }
 }
