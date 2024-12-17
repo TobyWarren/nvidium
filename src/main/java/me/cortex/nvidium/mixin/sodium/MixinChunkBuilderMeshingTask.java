@@ -1,5 +1,5 @@
 package me.cortex.nvidium.mixin.sodium;
-
+// being lazy and using gpt
 import me.cortex.nvidium.Nvidium;
 import me.cortex.nvidium.sodiumCompat.IRepackagedResult;
 import me.cortex.nvidium.sodiumCompat.SodiumResultCompatibility;
@@ -15,11 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(value = ChunkBuilderMeshingTask.class, remap = false)
 public class MixinChunkBuilderMeshingTask {
 
-    net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildContext
-    net.caffeinemc.mods.sodium.client.util.task.CancellationToken
-    net.caffeinemc.mods.sodium.client.render.chunk.compile.ChunkBuildOutput
-
-    // this inject doesn't wanna work correctly?
     @Inject(method = "execute(Lme/caffeinemc/mods/sodium/client/render/chunk/compile/ChunkBuildContext;" +
             "Lme/caffeinemc/mods/sodium/client/util/task/CancellationToken;" +
             ")Lme/caffeinemc/mods/sodium/client/render/chunk/compile/ChunkBuildOutput;", at = @At("TAIL"))
